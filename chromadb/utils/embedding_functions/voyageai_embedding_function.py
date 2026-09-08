@@ -114,6 +114,7 @@ class VoyageAIEmbeddingFunction(EmbeddingFunction[Documents]):
             inputs=[[document] for document in input],
             model=self.model_name,
             input_type=self.input_type,
+            truncation=self.truncation,
         )
 
         return [
