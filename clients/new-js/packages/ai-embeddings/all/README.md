@@ -37,7 +37,7 @@ const openAIEF = new OpenAIEmbeddingFunction({
 - Hugging Face Server
 - Ollama
 - Together AI
-- Voyage AI
+- Voyage AI by MongoDB
 - Cloudflare Worker AI
 - Default Embedding
 

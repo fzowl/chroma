@@ -2,7 +2,7 @@
   "name": "@chroma-core/voyageai",
   "version": "0.1.9",
   "private": false,
-  "description": "Voyage AI embedding provider for Chroma",
+  "description": "Voyage AI by MongoDB embedding provider for Chroma",
   "main": "dist/cjs/voyageai.cjs",
   "types": "dist/voyageai.d.ts",
   "module": "dist/voyageai.legacy-esm.js",

@@ -1,8 +1,8 @@
 ---
-title: VoyageAI
+title: VoyageAI by MongoDB
 ---
 
-Chroma also provides a convenient wrapper around VoyageAI's embedding API. This embedding function runs remotely on VoyageAI's servers, and requires an API key. You can get an API key by signing up for an account at [VoyageAI](https://dash.voyageai.com/).
+Chroma also provides a convenient wrapper around VoyageAI by MongoDB's embedding API. This embedding function runs remotely on VoyageAI's servers, and requires an API key. You can get an API key by signing up for an account at [VoyageAI by MongoDB](https://dash.voyageai.com/).
 
 <Tabs>
 <Tab title="Python" icon="python">
@@ -11,7 +11,7 @@ This embedding function relies on the `voyageai` python package, which you can i
 
 ```python
 import chromadb.utils.embedding_functions as embedding_functions
-voyageai_ef  = embedding_functions.VoyageAIEmbeddingFunction(api_key="YOUR_API_KEY",  model_name="voyage-3-large")
+voyageai_ef  = embedding_functions.VoyageAIEmbeddingFunction(api_key="YOUR_API_KEY",  model_name="voyage-4")
 voyageai_ef(input=["document1","document2"])
 ```
 
@@ -52,7 +52,7 @@ const collectionGet = await client.getCollection({
 ```python Python
 voyageai_ef  = embedding_functions.VoyageAIEmbeddingFunction(
     api_key="YOUR_API_KEY",
-    model_name="voyage-3-large"
+    model_name="voyage-4"
 )
 
 multilingual_texts  = [
@@ -70,7 +70,7 @@ voyageai_ef(input=multilingual_texts)
 ```typescript TypeScript
 import { VoyageAIEmbeddingFunction } from "chromadb";
 
-const embedder = new VoyageAIEmbeddingFunction("apiKey", "voyage-3-large");
+const embedder = new VoyageAIEmbeddingFunction("apiKey", "voyage-4");
 
 multilingual_texts = [
     "Hello from VoyageAI!",
@@ -89,4 +89,35 @@ const embeddings = embedder.generate(multilingual_texts);
 
 </CodeGroup>
 
-For further details on VoyageAI's models check the [documentation](https://docs.voyageai.com/docs/introduction) and the [blogs](https://blog.voyageai.com/).
+### Available models
+
+VoyageAI by MongoDB's current embedding models (all with a 32,000-token context
+window and a default of 1024 dimensions):
+
+| Model | Best for |
+| --- | --- |
+| `voyage-4-large` | Highest general-purpose and multilingual retrieval quality |
+| `voyage-4` | General-purpose and multilingual retrieval (recommended default) |
+| `voyage-4-lite` | Latency- and cost-optimized general-purpose retrieval |
+| `voyage-code-4` | Code retrieval and coding-agent use cases |
+| `voyage-finance-2` | Finance retrieval and RAG |
+| `voyage-law-2` | Legal retrieval and RAG |
+| `voyage-context-4` | Contextualized chunk embeddings (see below) |
+
+### Contextualized models
+
+Contextualized models (`voyage-context-*`) are supported through
+`contextualized_embed`. Each input string is embedded as its own independent
+document: the batch is sent as a flat `list[str]` with `enable_auto_chunking`
+enabled and `chunk_size=32000` (the model's per-chunk maximum), so every input
+resolves to exactly one chunk and one vector, returned in input order.
+
+```python
+voyageai_ef = embedding_functions.VoyageAIEmbeddingFunction(
+    api_key="YOUR_API_KEY",
+    model_name="voyage-context-4",
+)
+voyageai_ef(input=["document1", "document2"])
+```
+
+For further details on VoyageAI by MongoDB's models check the [documentation](https://docs.voyageai.com/docs/introduction) and the [blogs](https://blog.voyageai.com/).

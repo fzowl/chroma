@@ -8,13 +8,21 @@ import warnings
 
 class VoyageAIEmbeddingFunction(EmbeddingFunction[Documents]):
     """
-    This class is used to generate embeddings for a list of texts using the VoyageAI API.
+    This class is used to generate embeddings for a list of texts using the
+    VoyageAI by MongoDB embedding API.
+
+    Contextualized models (``voyage-context-*``) are supported as well: each
+    input string is embedded as its own document via ``contextualized_embed``.
     """
+
+    # Maximum per-chunk token window shared by the current voyage-context-*
+    # models. Passing this as ``chunk_size`` guarantees one chunk per input.
+    CONTEXT_CHUNK_SIZE = 32000
 
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model_name: str = "voyage-large-2",
+        model_name: str = "voyage-4",
         api_key_env_var: str = "CHROMA_VOYAGE_API_KEY",
         input_type: Optional[str] = None,
         truncation: bool = True,
@@ -23,12 +31,12 @@ class VoyageAIEmbeddingFunction(EmbeddingFunction[Documents]):
         Initialize the VoyageAIEmbeddingFunction.
 
         Args:
-            api_key_env_var (str, optional): Environment variable name that contains your API key for the VoyageAI API.
+            api_key_env_var (str, optional): Environment variable name that contains your API key for the VoyageAI by MongoDB API.
                 Defaults to "CHROMA_VOYAGE_API_KEY".
             model_name (str, optional): The name of the model to use for text embeddings.
-                Defaults to "voyage-large-2".
-            api_key (str, optional): API key for the VoyageAI API. If not provided, will look for it in the environment variable.
-            input_type (str, optional): The type of input to use for the VoyageAI API.
+                Defaults to "voyage-4".
+            api_key (str, optional): API key for the VoyageAI by MongoDB API. If not provided, will look for it in the environment variable.
+            input_type (str, optional): The type of input to use for the VoyageAI by MongoDB API.
                 Defaults to None.
             truncation (bool): Whether to truncate the input text.
                 Defaults to True.
@@ -73,6 +81,9 @@ class VoyageAIEmbeddingFunction(EmbeddingFunction[Documents]):
         Returns:
             Embeddings for the documents.
         """
+        if self.model_name.startswith("voyage-context"):
+            return self._contextualized_embed(input)
+
         embeddings = self._client.embed(
             texts=input,
             model=self.model_name,
@@ -84,6 +95,39 @@ class VoyageAIEmbeddingFunction(EmbeddingFunction[Documents]):
         return [
             np.array(embedding, dtype=np.float32) for embedding in embeddings.embeddings
         ]
+
+    def _contextualized_embed(self, input: Documents) -> Embeddings:
+        """
+        Generate embeddings using a contextualized model (``voyage-context-*``).
+
+        Each input string is embedded as its own independent document: the
+        batch is passed as a flat ``list[str]`` with ``enable_auto_chunking``
+        on and ``chunk_size`` set to the model's per-chunk maximum, so every
+        input resolves to exactly one chunk and therefore one vector, returned
+        in input order. Queries (``input_type="query"``) drop auto-chunking and
+        ``chunk_size``, which the API rejects for the query path.
+        """
+        texts = list(input)
+
+        if self.input_type == "query":
+            response = self._client.contextualized_embed(
+                inputs=texts,
+                model=self.model_name,
+                input_type="query",
+            )
+        else:
+            response = self._client.contextualized_embed(
+                inputs=texts,
+                model=self.model_name,
+                input_type="document",
+                enable_auto_chunking=True,
+                chunk_size=self.CONTEXT_CHUNK_SIZE,
+            )
+
+        # Each result maps to one input (ordered by index) and, given the large
+        # chunk_size, carries a single chunk embedding.
+        ordered = sorted(response.results, key=lambda r: r.index)
+        return [np.array(r.embeddings[0], dtype=np.float32) for r in ordered]
 
     @staticmethod
     def name() -> str:
