@@ -11,9 +11,36 @@ This embedding function relies on the `voyageai` python package, which you can i
 
 ```python
 import chromadb.utils.embedding_functions as embedding_functions
-voyageai_ef  = embedding_functions.VoyageAIEmbeddingFunction(api_key="YOUR_API_KEY",  model_name="voyage-3-large")
+voyageai_ef  = embedding_functions.VoyageAIEmbeddingFunction(api_key="YOUR_API_KEY",  model_name="voyage-3.5")
 voyageai_ef(input=["document1","document2"])
 ```
+
+Any current VoyageAI text embedding model can be passed as `model_name`, for
+example `voyage-3.5`, `voyage-3.5-lite`, `voyage-4`, `voyage-4-large`,
+`voyage-4-lite`, `voyage-code-4`, `voyage-finance-2`, or `voyage-law-2`. The
+plain text path batches inputs by estimated token count against the model's
+per-request token limit (falling back to an item-count cap), so large input
+lists are split into valid requests automatically.
+
+### Contextualized embeddings
+
+The `voyage-context-*` models (e.g. `voyage-context-3`) are also supported. Set
+`model_name` to a context model to use them:
+
+```python
+voyageai_ef = embedding_functions.VoyageAIEmbeddingFunction(
+    api_key="YOUR_API_KEY", model_name="voyage-context-3"
+)
+voyageai_ef(input=["document1", "document2"])
+```
+
+Each input string is embedded as its **own independent document** — there is no
+cross-input contextualization, since a generic embedding call may receive
+unrelated texts. On the document side, auto-chunking is enabled with the chunk
+size set to the model maximum so that every input resolves to exactly one chunk
+and one vector. For the retrieval side, construct the function with
+`input_type="query"`; auto-chunking is disabled automatically because the API
+does not allow it for queries.
 
 </Tab>
 <Tab title="TypeScript" icon="js">
