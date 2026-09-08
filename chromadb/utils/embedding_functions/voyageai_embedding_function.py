@@ -108,13 +108,15 @@ class VoyageAIEmbeddingFunction(EmbeddingFunction[Documents]):
         and the single resulting embedding per group is returned. This keeps a
         one-to-one mapping between input documents and output embeddings.
 
+        Unlike ``embed``, ``contextualized_embed`` does not accept a
+        ``truncation`` parameter, so ``self.truncation`` is not forwarded here.
+
         See https://docs.voyageai.com/docs/contextualized-chunk-embeddings
         """
         result = self._client.contextualized_embed(
             inputs=[[document] for document in input],
             model=self.model_name,
             input_type=self.input_type,
-            truncation=self.truncation,
         )
 
         return [
