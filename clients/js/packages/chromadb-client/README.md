@@ -111,7 +111,7 @@ This package supports multiple embedding providers as peer dependencies:
 - Default embeddings (`chromadb-default-embed`)
 - Google Generative AI (`@google/generative-ai`)
 - Xenova Transformers (`@xenova/transformers`)
-- Voyage AI (`voyageai`)
+- VoyageAI by MongoDB (`voyageai`)
 - Ollama (`ollama`)
 
 ## Why choose chromadb-client?

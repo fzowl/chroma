@@ -1,8 +1,8 @@
 ---
-title: VoyageAI
+title: VoyageAI by MongoDB
 ---
 
-Chroma also provides a convenient wrapper around VoyageAI's embedding API. This embedding function runs remotely on VoyageAI's servers, and requires an API key. You can get an API key by signing up for an account at [VoyageAI](https://dash.voyageai.com/).
+Chroma also provides a convenient wrapper around the VoyageAI by MongoDB embedding API. This embedding function runs remotely on VoyageAI by MongoDB's servers, and requires an API key. You can get an API key by signing up for an account at [VoyageAI by MongoDB](https://dash.voyageai.com/).
 
 <Tabs>
 <Tab title="Python" icon="python">
@@ -11,7 +11,7 @@ This embedding function relies on the `voyageai` python package, which you can i
 
 ```python
 import chromadb.utils.embedding_functions as embedding_functions
-voyageai_ef  = embedding_functions.VoyageAIEmbeddingFunction(api_key="YOUR_API_KEY",  model_name="voyage-3-large")
+voyageai_ef  = embedding_functions.VoyageAIEmbeddingFunction(api_key="YOUR_API_KEY",  model_name="voyage-4-large")
 voyageai_ef(input=["document1","document2"])
 ```
 
@@ -52,7 +52,7 @@ const collectionGet = await client.getCollection({
 ```python Python
 voyageai_ef  = embedding_functions.VoyageAIEmbeddingFunction(
     api_key="YOUR_API_KEY",
-    model_name="voyage-3-large"
+    model_name="voyage-4-large"
 )
 
 multilingual_texts  = [
@@ -70,7 +70,7 @@ voyageai_ef(input=multilingual_texts)
 ```typescript TypeScript
 import { VoyageAIEmbeddingFunction } from "chromadb";
 
-const embedder = new VoyageAIEmbeddingFunction("apiKey", "voyage-3-large");
+const embedder = new VoyageAIEmbeddingFunction("apiKey", "voyage-4-large");
 
 multilingual_texts = [
     "Hello from VoyageAI!",
@@ -89,4 +89,42 @@ const embeddings = embedder.generate(multilingual_texts);
 
 </CodeGroup>
 
-For further details on VoyageAI's models check the [documentation](https://docs.voyageai.com/docs/introduction) and the [blogs](https://blog.voyageai.com/).
+### Supported models
+
+VoyageAI by MongoDB currently offers the following text embedding models. See the
+[models documentation](https://docs.voyageai.com/docs/embeddings) for context lengths,
+output dimensions, and pricing.
+
+| Model | Best for |
+| --- | --- |
+| `voyage-4-large` | Best general-purpose and multilingual retrieval quality |
+| `voyage-4` | General-purpose and multilingual retrieval |
+| `voyage-4-lite` | Optimized for latency and cost |
+| `voyage-code-4` | Code retrieval and coding-agent use cases |
+| `voyage-finance-2` | Finance-domain retrieval and RAG |
+| `voyage-law-2` | Legal-domain retrieval and RAG |
+| `voyage-context-4` | Contextualized chunk embeddings (see below) |
+| `voyage-context-3` | Previous-generation contextualized chunk embeddings |
+
+### Contextualized chunk embeddings
+
+For the `voyage-context-*` models the embedding function calls VoyageAI by MongoDB's
+[contextualized chunk embeddings API](https://docs.voyageai.com/docs/contextualized-chunk-embeddings),
+which encodes each chunk in the context of the whole document. When you pass documents
+to Chroma the wrapper embeds each document as its own single-chunk group and returns one
+embedding per document, so it is a drop-in replacement for the standard models:
+
+```python
+voyageai_ef = embedding_functions.VoyageAIEmbeddingFunction(
+    api_key="YOUR_API_KEY",
+    model_name="voyage-context-4",
+    input_type="document",
+)
+
+voyageai_ef(input=["document1", "document2"])
+```
+
+The underlying `contextualized_embed` API accepts both `List[str]` and `List[List[str]]`
+inputs; the wrapper handles the conversion for you.
+
+For further details on the models offered by VoyageAI by MongoDB check the [documentation](https://docs.voyageai.com/docs/introduction) and the [blog](https://blog.voyageai.com/).
