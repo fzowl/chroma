@@ -1,6 +1,6 @@
-# Voyage AI Embedding Function for Chroma
+# VoyageAI by MongoDB Embedding Function for Chroma
 
-This package provides a Voyage AI embedding provider for Chroma.
+This package provides a VoyageAI by MongoDB embedding provider for Chroma.
 
 ## Installation
 
@@ -17,7 +17,7 @@ import { VoyageAIEmbeddingFunction } from '@chroma-core/voyageai';
 // Initialize the embedder
 const embedder = new VoyageAIEmbeddingFunction({
   apiKey: 'your-api-key', // Or set VOYAGE_API_KEY env var
-  modelName: 'voyage-2',
+  modelName: 'voyage-4-large',
 });
 
 // Create a new ChromaClient
@@ -52,7 +52,7 @@ Set your Voyage AI API key as an environment variable:
 export VOYAGE_API_KEY=your-api-key
 ```
 
-Get your API key from [Voyage AI](https://www.voyageai.com/).
+Get your API key from [VoyageAI by MongoDB](https://www.voyageai.com/).
 
 ## Configuration Options
 
@@ -62,14 +62,16 @@ Get your API key from [Voyage AI](https://www.voyageai.com/).
 
 ## Supported Models
 
-Voyage AI offers high-quality embedding models:
+VoyageAI by MongoDB offers high-quality embedding models:
 
-- `voyage-2` - Latest and most capable model
-- `voyage-large-2` - Larger model for maximum performance
-- `voyage-code-2` - Optimized for code and technical content
-- `voyage-lite-02-instruct` - Lightweight instruction-following model
+- `voyage-4-large` - Best general-purpose and multilingual retrieval quality
+- `voyage-4` - General-purpose and multilingual retrieval
+- `voyage-4-lite` - Optimized for latency and cost
+- `voyage-code-4` - Optimized for code retrieval and coding-agent use cases
+- `voyage-finance-2` - Optimized for finance-domain retrieval and RAG
+- `voyage-law-2` - Optimized for legal-domain retrieval and RAG
 
-Check the [Voyage AI documentation](https://docs.voyageai.com/embeddings/) for the complete list of available models and their specifications.
+Check the [VoyageAI by MongoDB documentation](https://docs.voyageai.com/docs/embeddings) for the complete list of available models and their specifications.
 
 ## Features
 
